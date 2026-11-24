@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('FAQ')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main class="container wide">
+<div class="admin-layout">
+<aside th:replace="~{fragments :: admin-menu('faq')}"></aside>
+<div class="admin-main">
+    <h2>Manage FAQ</h2>
+    <a th:href="@{/admin}">&larr; Back to dashboard</a>
+    <p class="msg" th:if="${message}" th:text="${message}"></p>
+    <p class="error-box" th:if="${error}" th:text="${error}"></p>
+
+    <div class="card">
+        <h3 th:text="${faq.faqId == null} ? 'Add a question' : 'Edit question'">Add a question</h3>
+        <form th:action="@{/admin/faq}" method="post">
+            <input type="hidden" name="faqId" th:if="${faq.faqId != null}" th:value="${faq.faqId}">
+            <label for="question">Question (English)</label>
+            <input id="question" name="question" type="text" maxlength="300" required th:value="${faq.question}">
+            <label for="questionTa">Question (Tamil)</label>
+            <input id="questionTa" name="questionTa" type="text" maxlength="600" th:value="${faq.questionTa}">
+            <label for="answer">Answer (English)</label>
+            <textarea id="answer" name="answer" rows="3" maxlength="2000" required th:text="${faq.answer}"></textarea>
+            <label for="answerTa">Answer (Tamil)</label>
+            <textarea id="answerTa" name="answerTa" rows="3" maxlength="4000" th:text="${faq.answerTa}"></textarea>
+            <label for="displayOrder">Display order (smaller numbers first)</label>
+            <input id="displayOrder" name="displayOrder" type="number" th:value="${faq.displayOrder}">
+            <button type="submit">Save</button>
+            <a class="btn secondary" th:if="${faq.faqId != null}" th:href="@{/admin/faq}">Cancel</a>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>Questions</h3>
+        <p class="muted" th:if="${faqs.isEmpty()}">No questions yet.</p>
+        <div class="table-wrap" th:unless="${faqs.isEmpty()}">
+            <table>
+                <tr><th>Order</th><th>Question</th><th></th></tr>
+                <tr th:each="f : ${faqs}">
+                    <td th:text="${f.displayOrder}">1</td>
+                    <td th:text="${f.question}">Question</td>
+                    <td>
+                        <a class="btn secondary" th:href="@{/admin/faq/{id}(id=${f.faqId})}">Edit</a>
+                        <form th:action="@{/admin/faq/{id}/delete(id=${f.faqId})}" method="post" style="display:inline"
+                              onsubmit="return confirm('Delete this FAQ?');"><button class="danger" type="submit">Delete</button></form>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

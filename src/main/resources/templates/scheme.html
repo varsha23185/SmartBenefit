@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(#{guidance.title})}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main class="container">
+    <div class="card">
+        <h2 th:text="${scheme.localName(#locale.language)}">Scheme</h2>
+        <p th:text="${scheme.localDescription(#locale.language)}">Description</p>
+        <p class="muted"><span th:text="${scheme.benefitType}">Cash</span> - Rs
+            <span th:text="${#numbers.formatDecimal(scheme.benefitAmount, 1, 'COMMA', 0, 'POINT')}">0</span></p>
+    </div>
+    <div class="card">
+        <h3 th:text="#{guidance.documents}">Required documents</h3>
+        <ul>
+            <li th:each="d : ${scheme.documents}">
+                <span th:text="${d.documentName}">Document</span>
+                <span class="badge" th:classappend="${d.requirementType.name() == 'MANDATORY'} ? 'st-NOT_ELIGIBLE' : 'st-INFORMATION_REQUIRED'"
+                      th:text="${d.requirementType.name() == 'MANDATORY'} ? #{guidance.mandatory} : #{guidance.optional}">Mandatory</span>
+            </li>
+        </ul>
+    </div>
+    <div class="card">
+        <h3 th:text="#{guidance.steps}">Application steps</h3>
+        <ol>
+            <li th:each="s : ${scheme.steps}">
+                <span th:text="${s.description}">Step</span>
+                <a th:if="${s.portalLink != null}" th:href="${s.portalLink}" target="_blank" rel="noopener" th:text="#{guidance.portal}">Portal</a>
+            </li>
+        </ol>
+        <p class="muted" th:text="#{guidance.disclaimer}"></p>
+        <a class="btn secondary" th:href="@{/results}" th:text="#{guidance.back}">Back</a>
+    </div>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(#{faq.title})}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main class="container">
+    <div class="card">
+        <h2 th:text="#{faq.title}">Frequently Asked Questions</h2>
+        <p class="muted" th:if="${faqs.isEmpty()}" th:text="#{faq.empty}">No questions have been added yet.</p>
+        <details th:each="f : ${faqs}">
+            <summary th:text="${f.localQuestion(#locale.language)}">Question</summary>
+            <p th:text="${f.localAnswer(#locale.language)}">Answer</p>
+        </details>
+    </div>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(#{home.title})}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+
+<section class="hero">
+    <div class="container">
+        <h1 th:text="#{home.hero.title}">Find the government schemes you may be eligible for</h1>
+        <p th:text="#{home.hero.sub}">Enter your details once. SmartBenefit checks every scheme, explains each decision and ranks the best ones for you.</p>
+        <a class="btn accent" th:href="@{/register}" th:text="#{home.cta.start}">Create a free account</a>
+        <a class="btn ghost" th:href="@{/login}" th:text="#{home.cta.login}">Login</a>
+    </div>
+</section>
+
+<main class="container wide">
+    <div class="features">
+        <div class="feature">
+            <div class="icon">&#9989;</div>
+            <h3 th:text="#{home.f1.title}">Check every scheme at once</h3>
+            <p th:text="#{home.f1.text}">One profile, all schemes.</p>
+        </div>
+        <div class="feature">
+            <div class="icon">&#128269;</div>
+            <h3 th:text="#{home.f2.title}">Know why</h3>
+            <p th:text="#{home.f2.text}">Every condition is shown as met, not met or missing.</p>
+        </div>
+        <div class="feature">
+            <div class="icon">&#127942;</div>
+            <h3 th:text="#{home.f3.title}">Ranked for you</h3>
+            <p th:text="#{home.f3.text}">Eligible schemes are ranked by a transparent score.</p>
+        </div>
+        <div class="feature">
+            <div class="icon">&#128260;</div>
+            <h3 th:text="#{home.f4.title}">Try what-if</h3>
+            <p th:text="#{home.f4.text}">Change your details and see which schemes would change.</p>
+        </div>
+    </div>
+
+    <h2 class="center" th:text="#{home.how.title}">How it works</h2>
+    <ol class="steps">
+        <li><span>1</span><p th:text="#{home.step1}">Register and log in</p></li>
+        <li><span>2</span><p th:text="#{home.step2}">Fill in your profile</p></li>
+        <li><span>3</span><p th:text="#{home.step3}">Check your eligibility</p></li>
+        <li><span>4</span><p th:text="#{home.step4}">Open a scheme to see how to apply</p></li>
+    </ol>
+    <p class="note-strip" th:text="#{home.note}">SmartBenefit gives guidance only.</p>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

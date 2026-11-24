@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Scheme')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main class="container wide">
+<div class="admin-layout">
+<aside th:replace="~{fragments :: admin-menu('scheme')}"></aside>
+<div class="admin-main">
+    <h2 th:text="${scheme.schemeId == null} ? 'Add scheme' : 'Edit scheme'">Scheme</h2>
+    <a th:href="@{/admin}">&larr; Back to dashboard</a>
+    <p class="msg" th:if="${message}" th:text="${message}"></p>
+    <p class="error-box" th:if="${error}" th:text="${error}"></p>
+
+    <div class="card">
+        <h3>Scheme details</h3>
+        <form th:action="@{/admin/scheme}" method="post">
+            <input type="hidden" name="schemeId" th:value="${scheme.schemeId}">
+            <div class="grid">
+                <div><label>Name (English)</label><input name="name" required th:value="${scheme.name}"></div>
+                <div><label>Name (Tamil)</label><input name="nameTa" th:value="${scheme.nameTa}"></div>
+                <div><label>Benefit type</label><input name="benefitType" th:value="${scheme.benefitType}"></div>
+                <div><label>Benefit amount (Rs)</label><input name="benefitAmount" type="number" step="any" min="0" th:value="${scheme.benefitAmount}"></div>
+                <div><label>Target group</label><input name="category" th:value="${scheme.category}"></div>
+            </div>
+            <label>Description (English)</label><textarea name="description" rows="2" th:text="${scheme.description}"></textarea>
+            <label>Description (Tamil)</label><textarea name="descriptionTa" rows="2" th:text="${scheme.descriptionTa}"></textarea>
+            <button type="submit">Save scheme</button>
+        </form>
+    </div>
+
+    <th:block th:if="${scheme.schemeId != null}">
+        <div class="card">
+            <h3>Eligibility criteria</h3>
+            <p class="muted">Each row is one rule. Mandatory rules decide eligibility; optional rules only affect the match score.</p>
+            <div class="table-wrap">
+                <table>
+                    <tr><th>Parameter</th><th>Operator</th><th>Min</th><th>Max</th><th>Allowed values</th><th>Mandatory</th><th></th></tr>
+                    <tr th:each="c : ${scheme.criteria}">
+                        <td th:text="${c.parameter}">age</td><td th:text="${c.operator}">BETWEEN</td>
+                        <td th:text="${c.minValue}"></td><td th:text="${c.maxValue}"></td><td th:text="${c.allowedValues}"></td>
+                        <td th:text="${c.mandatory} ? 'Yes' : 'No'">Yes</td>
+                        <td><form th:action="@{/admin/scheme/{id}/criterion/{cid}/delete(id=${scheme.schemeId},cid=${c.criterionId})}" method="post"><button class="danger" type="submit">Delete</button></form></td>
+                    </tr>
+                </table>
+            </div>
+            <h4>Add a criterion</h4>
+            <form th:action="@{/admin/scheme/{id}/criterion(id=${scheme.schemeId})}" method="post">
+                <div class="grid">
+                    <div><label>Parameter</label><select name="parameter"><option th:each="p : ${parameters}" th:value="${p}" th:text="${p}"></option></select></div>
+                    <div><label>Operator</label><select name="operator"><option th:each="o : ${operators}" th:value="${o}" th:text="${o}"></option></select></div>
+                    <div><label>Min value</label><input name="minValue" type="number" step="any"></div>
+                    <div><label>Max value</label><input name="maxValue" type="number" step="any"></div>
+                    <div><label>Allowed values (comma separated, for EQUALS / IN_LIST)</label><input name="allowedValues" placeholder="e.g. rural or SC,ST,OBC"></div>
+                    <div><label><input type="checkbox" name="mandatory" value="true" checked> Mandatory</label></div>
+                </div>
+                <button type="submit">Add criterion</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3>Required documents</h3>
+            <ul><li th:each="d : ${scheme.documents}">
+                <span th:text="${d.documentName} + ' (' + ${d.requirementType} + ')'">Doc</span>
+                <form th:action="@{/admin/scheme/{id}/document/{did}/delete(id=${scheme.schemeId},did=${d.documentId})}" method="post" style="display:inline"><button class="danger" type="submit">x</button></form>
+            </li></ul>
+            <form th:action="@{/admin/scheme/{id}/document(id=${scheme.schemeId})}" method="post" class="grid">
+                <div><label>Document name</label><input name="documentName" required></div>
+                <div><label>Type</label><select name="requirementType"><option value="MANDATORY">MANDATORY</option><option value="OPTIONAL">OPTIONAL</option></select></div>
+                <div><button type="submit">Add document</button></div>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3>Application steps</h3>
+            <ol><li th:each="s : ${scheme.steps}">
+                <span th:text="'#' + ${s.stepNumber} + ' ' + ${s.description} + ' ' + (${s.portalLink} ?: '')">Step</span>
+                <form th:action="@{/admin/scheme/{id}/step/{sid}/delete(id=${scheme.schemeId},sid=${s.stepId})}" method="post" style="display:inline"><button class="danger" type="submit">x</button></form>
+            </li></ol>
+            <form th:action="@{/admin/scheme/{id}/step(id=${scheme.schemeId})}" method="post" class="grid">
+                <div><label>Step number</label><input name="stepNumber" type="number" min="1" required></div>
+                <div><label>Description</label><input name="description" required></div>
+                <div><label>Portal link (optional)</label><input name="portalLink" type="url" placeholder="https://"></div>
+                <div><button type="submit">Add step</button></div>
+            </form>
+        </div>
+    </th:block>
+</div>
+</div>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

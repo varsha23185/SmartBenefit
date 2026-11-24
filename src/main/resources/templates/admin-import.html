@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Import schemes')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main class="container wide">
+<div class="admin-layout">
+<aside th:replace="~{fragments :: admin-menu('import')}"></aside>
+<div class="admin-main">
+    <h2>Import schemes from a CSV file</h2>
+    <p class="muted">Add many schemes at once without changing any code. The whole file is checked first: if any row is invalid,
+        nothing is saved and every problem is listed with its row number. A scheme whose name already exists is skipped.</p>
+
+    <div class="card" th:if="${error}"><p class="error-box" th:text="${error}"></p></div>
+
+    <div class="card" th:if="${result != null}">
+        <h3>Import result</h3>
+        <div th:if="${result.success()}">
+            <p class="msg">The file was valid.
+                <strong th:text="${result.schemesAdded()}">0</strong> scheme(s) added with
+                <strong th:text="${result.criteria()}">0</strong> criteria,
+                <strong th:text="${result.documents()}">0</strong> documents and
+                <strong th:text="${result.steps()}">0</strong> steps.</p>
+            <div th:unless="${result.skipped().isEmpty()}">
+                <p class="muted">Skipped because a scheme with the same name already exists:</p>
+                <ul><li th:each="n : ${result.skipped()}" th:text="${n}">name</li></ul>
+            </div>
+            <a class="btn secondary" th:href="@{/admin}">View the schemes on the dashboard</a>
+        </div>
+        <div th:unless="${result.success()}">
+            <p class="error-box">Nothing was imported. Please correct these problems and upload the file again:</p>
+            <ul><li class="err" th:each="e : ${result.errors()}" th:text="${e}">error</li></ul>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>1. Upload your own file</h3>
+        <form th:action="@{/admin/import(_csrf=${_csrf.token})}" method="post" enctype="multipart/form-data">
+            <label for="file">CSV file (UTF-8, at most 1 MB)</label>
+            <input id="file" name="file" type="file" accept=".csv,text/csv" required>
+            <button type="submit">Check and import</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>2. Load the verified central schemes</h3>
+        <p>The application includes a file of nine central schemes (pension, insurance, health, housing, scholarship, artisan support and LPG) whose rules
+            were taken from official sources. Each description ends with its source link. Import them with one click, or download the file to use as a template.</p>
+        <form th:action="@{/admin/import/bundled}" method="post" style="display:inline">
+            <button type="submit">Import the central schemes</button>
+        </form>
+        <a class="btn secondary" th:href="@{/admin/import/sample}">Download the file (template)</a>
+    </div>
+
+    <div class="card">
+        <h3>File format</h3>
+        <p>The first row is a header. Every other row has a <code>type</code> and the <code>scheme</code> it belongs to.
+            Define a scheme with a SCHEME row first, then add its CRITERION, DOCUMENT and STEP rows. A row that starts with # is a comment.</p>
+        <div class="table-wrap">
+        <table>
+            <tr><th>type</th><th>columns used</th></tr>
+            <tr><td>SCHEME</td><td>scheme (English name), name_ta, description, description_ta, benefit_type, benefit_amount, category</td></tr>
+            <tr><td>CRITERION</td><td>scheme, parameter (age, income, family_size, education_level, location, occupation, category, marital_status, gender),
+                operator (BETWEEN, LESS_THAN_OR_EQUAL, GREATER_THAN_OR_EQUAL, EQUALS, IN_LIST), min_value, max_value, allowed_values (comma separated), mandatory (true or false)</td></tr>
+            <tr><td>DOCUMENT</td><td>scheme, document_name, requirement_type (MANDATORY or OPTIONAL)</td></tr>
+            <tr><td>STEP</td><td>scheme, step_number, step_text, portal_link (optional, must start with http:// or https://)</td></tr>
+        </table>
+        </div>
+        <p class="muted">Every scheme needs at least one CRITERION row. Use BETWEEN, LESS_THAN_OR_EQUAL and GREATER_THAN_OR_EQUAL only for age, income and family_size.
+            Put values that contain commas inside double quotes.</p>
+    </div>
+</div>
+</div>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(#{whatif.title})}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main class="container">
+    <div class="card">
+        <h2 th:text="#{whatif.title}">What-If Simulator</h2>
+        <p class="muted" th:text="#{whatif.intro}"></p>
+        <p class="muted"><b th:text="#{whatif.current}">Current</b>:
+            <span th:text="|${current.age ?: '-'} / ${current.income ?: '-'} / ${current.familySize ?: '-'} / ${current.educationLevel ?: '-'} / ${current.location ?: '-'} / ${current.occupation ?: '-'} / ${current.category ?: '-'} / ${current.maritalStatus ?: '-'} / ${current.gender ?: '-'}|"></span></p>
+        <form th:action="@{/whatif}" th:object="${form}" method="post">
+            <div th:replace="~{fragments :: profile-fields}"></div>
+            <button type="submit" th:text="#{whatif.run}">Run Scenario</button>
+        </form>
+    </div>
+
+    <div class="card" th:if="${changes != null}">
+        <h3 th:text="#{whatif.changes}">Scenario result</h3>
+        <div class="table-wrap">
+            <table>
+                <tr><th th:text="#{results.scheme}">Scheme</th><th th:text="#{whatif.before}">Now</th><th th:text="#{whatif.after}">Scenario</th><th></th></tr>
+                <tr th:each="c : ${changes}">
+                    <td th:text="${c.scheme.localName(#locale.language)}">Scheme</td>
+                    <td><span class="badge" th:classappend="${'st-' + c.before}" th:text="#{|status.${c.before}|}">x</span></td>
+                    <td><span class="badge" th:classappend="${'st-' + c.after}" th:text="#{|status.${c.after}|}">x</span></td>
+                    <td>
+                        <b th:if="${c.changed()}" th:text="#{whatif.changed}">Changed</b>
+                        <span th:unless="${c.changed()}" class="muted" th:text="#{whatif.same}">No change</span>
+                        <div class="explain" th:if="${c.changed()}" th:text="${c.explanationAfter}"></div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

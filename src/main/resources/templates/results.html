@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(#{results.title})}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main class="container">
+    <h2 th:text="#{results.title}">Your Eligibility Results</h2>
+    <form th:action="@{/check}" method="post">
+        <button type="submit" th:text="#{dash.check}">Check My Eligibility</button>
+    </form>
+    <p th:if="${assessments.isEmpty()}" th:text="#{results.empty}"></p>
+
+    <div class="card" th:unless="${assessments.isEmpty()}">
+        <h3 th:text="#{results.ranked}">Recommended schemes</h3>
+        <p th:if="${recommendations.isEmpty()}" th:text="#{results.noeligible}"></p>
+        <div class="table-wrap" th:unless="${recommendations.isEmpty()}">
+            <table>
+                <tr>
+                    <th th:text="#{results.rank}">Rank</th><th th:text="#{results.scheme}">Scheme</th>
+                    <th th:text="#{results.benefit}">Benefit</th><th th:text="#{results.score}">Score</th>
+                </tr>
+                <tr th:each="r : ${recommendations}">
+                    <td th:text="${r.rankPosition}">1</td>
+                    <td><a th:href="@{/scheme/{id}(id=${r.scheme.schemeId})}" th:text="${r.scheme.localName(#locale.language)}">Scheme</a></td>
+                    <td><span th:text="${r.scheme.benefitType}">Cash</span>: Rs <span th:text="${#numbers.formatDecimal(r.scheme.benefitAmount, 1, 'COMMA', 0, 'POINT')}">0</span></td>
+                    <td th:text="${#numbers.formatDecimal(r.score, 1, 3)}">0.000</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <h3 th:unless="${assessments.isEmpty()}" th:text="#{results.all}">Result for every scheme</h3>
+    <div class="card scheme-card" th:each="a : ${assessments}" th:classappend="${'card-' + a.status}">
+        <h3 th:text="${a.scheme.localName(#locale.language)}">Scheme</h3>
+        <span class="badge" th:classappend="${'st-' + a.status}" th:text="#{|status.${a.status}|}">Status</span>
+        <span class="muted"> &nbsp; <span th:text="#{results.match}">Match score</span>: <span th:text="${#numbers.formatDecimal(a.matchScore, 1, 2)}">0.00</span></span>
+        <p class="explain" th:text="${a.explanation}">explanation</p>
+        <a th:if="${a.status.name() == 'ELIGIBLE'}" class="btn secondary" th:href="@{/scheme/{id}(id=${a.scheme.schemeId})}" th:text="#{results.guidance}">How to apply</a>
+    </div>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

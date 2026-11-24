@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(#{profile.title})}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main class="container">
+    <div class="card">
+        <h2 th:text="#{profile.title}">My Profile</h2>
+        <p class="muted" th:text="#{profile.hint}"></p>
+        <p class="msg" th:if="${saved}" th:text="#{profile.saved}"></p>
+        <form th:action="@{/profile}" th:object="${form}" method="post">
+            <div th:replace="~{fragments :: profile-fields}"></div>
+            <button type="submit" th:text="#{profile.save}">Save Profile</button>
+        </form>
+        <form th:action="@{/check}" method="post">
+            <button type="submit" class="secondary" th:text="#{dash.check}">Check My Eligibility</button>
+        </form>
+    </div>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(#{nav.dashboard})}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main class="container">
+    <div class="card welcome">
+        <h2><span th:text="#{dash.welcome}">Welcome</span>, <span th:text="${userName}">User</span></h2>
+        <p th:text="#{dash.intro}"></p>
+        <a class="btn secondary" th:href="@{/profile}" th:text="#{dash.profile}">Update Profile</a>
+        <form th:action="@{/check}" method="post" style="display:inline">
+            <button type="submit" th:text="#{dash.check}">Check My Eligibility</button>
+        </form>
+    </div>
+    <div class="card">
+        <h3 th:text="#{dash.top}">Your recommended schemes</h3>
+        <p th:if="${recommendations.isEmpty()}" th:text="#{dash.none}"></p>
+        <div class="table-wrap" th:unless="${recommendations.isEmpty()}">
+            <table>
+                <tr><th th:text="#{results.rank}">Rank</th><th th:text="#{results.scheme}">Scheme</th><th th:text="#{results.score}">Score</th></tr>
+                <tr th:each="r : ${recommendations}">
+                    <td th:text="${r.rankPosition}">1</td>
+                    <td><a th:href="@{/scheme/{id}(id=${r.scheme.schemeId})}" th:text="${r.scheme.localName(#locale.language)}">Scheme</a></td>
+                    <td th:text="${#numbers.formatDecimal(r.score, 1, 3)}">0.000</td>
+                </tr>
+            </table>
+        </div>
+        <a th:unless="${recommendations.isEmpty()}" class="btn secondary" th:href="@{/results}" th:text="#{results.title}">Results</a>
+    </div>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title} + ' - SmartBenefit'">SmartBenefit</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header th:fragment="nav" class="topbar">
+    <div class="container">
+        <a class="brand" th:href="@{/}" th:text="#{app.name}">SmartBenefit</a>
+        <span sec:authorize="isAuthenticated()">
+            <a th:href="@{/dashboard}" th:text="#{nav.dashboard}">Home</a>
+        </span>
+        <span sec:authorize="isAnonymous()">
+            <a th:href="@{/login}" th:text="#{nav.login}">Login</a>
+            <a class="pill" th:href="@{/register}" th:text="#{nav.register}">Register</a>
+        </span>
+        <span>
+            <a th:href="@{/faq}" th:text="#{nav.faq}">FAQ</a>
+        </span>
+        <span sec:authorize="hasRole('CITIZEN')">
+            <a th:href="@{/profile}" th:text="#{nav.profile}">Profile</a>
+            <a th:href="@{/whatif}" th:text="#{nav.whatif}">What-If</a>
+        </span>
+        <span sec:authorize="hasRole('ADMIN')">
+            <a th:href="@{/admin}" th:text="#{nav.admin}">Admin</a>
+        </span>
+        <span sec:authorize="isAuthenticated()">
+            <a th:href="@{/account/password}" th:text="#{nav.password}">Change Password</a>
+        </span>
+        <span>
+            <a href="?lang=en">English</a> | <a href="?lang=ta">தமிழ்</a>
+        </span>
+        <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post">
+            <button type="submit" class="link" th:text="#{nav.logout}">Logout</button>
+        </form>
+    </div>
+</header>
+
+<footer th:fragment="footer" class="site-footer">
+    <div class="container">
+        <strong th:text="#{app.name}">SmartBenefit</strong>
+        <span th:text="#{footer.note}">An academic prototype that gives guidance only.</span>
+    </div>
+</footer>
+
+<aside th:fragment="admin-menu(active)" class="admin-menu">
+    <h4>Administration</h4>
+    <a th:href="@{/admin}" th:classappend="${active == 'dashboard'} ? 'active'">Dashboard</a>
+    <a th:href="@{/admin/scheme/new}" th:classappend="${active == 'scheme'} ? 'active'">Add scheme</a>
+    <a th:href="@{/admin/import}" th:classappend="${active == 'import'} ? 'active'">Import schemes (CSV)</a>
+    <a th:href="@{/admin/faq}" th:classappend="${active == 'faq'} ? 'active'">Manage FAQ</a>
+</aside>
+
+<!-- The nine profile fields; used inside a <form th:object="${form}"> by profile.html and whatif.html -->
+<div th:fragment="profile-fields" class="grid">
+    <div>
+        <label for="age" th:text="#{field.age}">Age</label>
+        <input id="age" type="number" th:field="*{age}">
+        <span class="err" th:if="${#fields.hasErrors('age')}" th:errors="*{age}"></span>
+    </div>
+    <div>
+        <label for="income" th:text="#{field.income}">Income</label>
+        <input id="income" type="number" step="any" th:field="*{income}">
+        <span class="err" th:if="${#fields.hasErrors('income')}" th:errors="*{income}"></span>
+    </div>
+    <div>
+        <label for="familySize" th:text="#{field.familySize}">Family size</label>
+        <input id="familySize" type="number" th:field="*{familySize}">
+        <span class="err" th:if="${#fields.hasErrors('familySize')}" th:errors="*{familySize}"></span>
+    </div>
+    <div>
+        <label for="educationLevel" th:text="#{field.education}">Education</label>
+        <select id="educationLevel" th:field="*{educationLevel}">
+            <option value="" th:text="#{field.select}"></option>
+            <option th:each="o : ${ {'none','primary','secondary','graduate','postgraduate'} }" th:value="${o}" th:text="#{|opt.${o}|}"></option>
+        </select>
+    </div>
+    <div>
+        <label for="location" th:text="#{field.location}">Residence</label>
+        <select id="location" th:field="*{location}">
+            <option value="" th:text="#{field.select}"></option>
+            <option th:each="o : ${ {'rural','urban'} }" th:value="${o}" th:text="#{|opt.${o}|}"></option>
+        </select>
+    </div>
+    <div>
+        <label for="occupation" th:text="#{field.occupation}">Occupation</label>
+        <select id="occupation" th:field="*{occupation}">
+            <option value="" th:text="#{field.select}"></option>
+            <option th:each="o : ${ {'farmer','labourer','student','self-employed','other'} }" th:value="${o}" th:text="#{|opt.${o}|}"></option>
+        </select>
+    </div>
+    <div>
+        <label for="category" th:text="#{field.category}">Category</label>
+        <select id="category" th:field="*{category}">
+            <option value="" th:text="#{field.select}"></option>
+            <option th:each="o : ${ {'GENERAL','OBC','SC','ST'} }" th:value="${o}" th:text="#{|opt.${o}|}"></option>
+        </select>
+    </div>
+    <div>
+        <label for="maritalStatus" th:text="#{field.marital}">Marital status</label>
+        <select id="maritalStatus" th:field="*{maritalStatus}">
+            <option value="" th:text="#{field.select}"></option>
+            <option th:each="o : ${ {'single','married','widowed'} }" th:value="${o}" th:text="#{|opt.${o}|}"></option>
+        </select>
+    </div>
+    <div>
+        <label for="gender" th:text="#{field.gender}">Gender</label>
+        <select id="gender" th:field="*{gender}">
+            <option value="" th:text="#{field.select}"></option>
+            <option th:each="o : ${ {'male','female','other'} }" th:value="${o}" th:text="#{|opt.${o}|}"></option>
+        </select>
+    </div>
+</div>
+</body>
+</html>
